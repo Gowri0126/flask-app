@@ -22,21 +22,6 @@ pipeline {
                 sh "docker build -t flaskapp:1.0 ."
             }
         }
-
-        stage('Deploy to Docker Swarm') {
-            steps {
-                sh """
-                # Remove old service if exists
-                docker service rm flask_service || true
-
-                # Create new service
-                docker service create \
-                  --name flask_service \
-                  --publish published=8080,target=5000 \
-                  flaskapp:1.0
-                """
-            }
-        }
         stage('Push Docker Image') {
     steps {
         # Tag for Docker Hu
@@ -50,6 +35,22 @@ pipeline {
         """
     }
 }
+
+        stage('Deploy to Docker Swarm') {
+            steps {
+                sh """
+                # Remove old service if exists
+                docker service rm flask_service || true
+
+                # Create new service
+                docker service create \
+                  --name flask_service \
+                  --publish published=8080,target=5000 \
+                  gowri032/flaskapp:1.0
+                """
+            }
+        }
+        
     }
 
     post {
