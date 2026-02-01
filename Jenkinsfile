@@ -37,6 +37,19 @@ pipeline {
                 """
             }
         }
+        stage('Push Docker Image') {
+    steps {
+        # Tag for Docker Hu
+        docker tag flaskapp:1.0 gowri032/flask-app:1.0
+
+        # Login to Docker Hub (make sure credentials stored in Jenkins)
+        echo "g123456789" | docker login -u "gowri032" --password-stdin
+
+        # Push to Docker Hub
+        docker push gowri032/flask-app:1.0
+        """
+    }
+}
     }
 
     post {
