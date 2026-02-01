@@ -3,7 +3,7 @@ pipeline {
 
     stages {
 
-        stage('Clone Repository') {
+        stage('Clone Source Code') {
             steps {
                 git 'https://github.com/Gowri0126/flask-app.git'
             }
@@ -11,11 +11,11 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t flask-app:1.0 .'
+                sh 'docker build -t flaskapp:1.0 .'
             }
         }
 
-        stage('Deploy on Docker Swarm') {
+        stage('Deploy to Docker Swarm') {
             steps {
                 sh '''
                 docker service rm flask_service || true
@@ -23,7 +23,7 @@ pipeline {
                 docker service create \
                 --name flask_service \
                 --publish published=8080,target=5000 \
-                flask-app:1.0
+                flaskapp:1.0
                 '''
             }
         }
