@@ -1,31 +1,50 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = "flaskapp:1.0"
+        SERVICE_NAME = "flask_service"
+        SERVICE_PORT = "8080"
+        CONTAINER_PORT = "5000"
+    }
+
     stages {
 
-        stage('Clone Source Code') {
+        stage('Checkout Source Code') {
             steps {
-                git 'https://github.com/Gowri0126/flask-app.git'
+                // Checkout from main branch
+                git branch: 'main', url: 'https://github.com/Gowri0126/flask-app.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t flaskapp:1.0 .'
+                sh "docker build -t flaskapp:1.0 ."
             }
         }
 
         stage('Deploy to Docker Swarm') {
             steps {
-                sh '''
+                sh """
+                # Remove old service if exists
                 docker service rm flask_service || true
 
+                # Create new service
                 docker service create \
-                --name flask_service \
-                --publish published=8080,target=5000 \
-                flaskapp:1.0
-                '''
+                  --name flask_service \
+                  --publish published=8080,target=5000 \
+                  flaskapp:1.0
+                """
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline finished successfully. Flask app deployed on Docker Swarm!"
+        }
+        failure {
+            echo "Pipeline failed. Check console output for errors."
         }
     }
 }
